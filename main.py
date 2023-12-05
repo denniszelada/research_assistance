@@ -1,7 +1,11 @@
-from langchain.chat.models import ChatOpanAI
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+
+load_dotenv()
 
 template = """Summarize the following question based on the context:
 
@@ -29,6 +33,3 @@ def scrape_text(url: str):
         print(e)
         return f"Failed to retrieve the webpage: {e}"
     
-
-
-url = "https://blog.langchain.dev/announcing-langsmith/"
