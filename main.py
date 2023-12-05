@@ -1,6 +1,7 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnablePassthrough
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -39,11 +40,13 @@ url = "https://blog.langchain.dev/announcing-langsmith/"
 
 page_content = scrape_text(url)[:10000]
 
-chain = SUMMARY_PROMPT | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
+chain = RunnablePassthrough.assign (
+    text=lambda x: scrape_text(x["url"])[10000]
+) | SUMMARY_PROMPT | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
 
 chain.invoke(
     {
         "question": "what is langsmith",
-        "text": page_content
+        "url": url
     }
 )
