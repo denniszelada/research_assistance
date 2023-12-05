@@ -33,3 +33,15 @@ def scrape_text(url: str):
         print(e)
         return f"Failed to retrieve the webpage: {e}"
     
+url = "https://blog.langchain.dev/announcing-langsmith/"
+
+page_content = scrape_text(url)[:10000]
+
+chain = prompt | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
+
+chain.invoke(
+    {
+        "question": "what is langsmith",
+        "context": page_content
+    }
+)
