@@ -7,15 +7,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-template = """Summarize the following question based on the context:
+SUMMARY_TEMPLATE = """{text}
 
-Question: {question}
+------
 
-Context
+Using the above text, answer in short the following question:
 
-{context}"""
+> {question}
 
-prompt = ChatPromptTemplate.from_template(template)
+-------
+if the question cannot be answered using the text, imply summarize the text. Include all factual information, numbers, stats, etc."""
+SUMMARY_PROMPT = ChatPromptTemplate.from_template(SUMMARY_TEMPLATE)
 
 def scrape_text(url: str):
     try:
@@ -37,11 +39,11 @@ url = "https://blog.langchain.dev/announcing-langsmith/"
 
 page_content = scrape_text(url)[:10000]
 
-chain = prompt | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
+chain = SUMMARY_PROMPT | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
 
 chain.invoke(
     {
         "question": "what is langsmith",
-        "context": page_content
+        "text": page_content
     }
 )
