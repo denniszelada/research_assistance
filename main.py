@@ -5,8 +5,13 @@ from langchain.schema.runnable import RunnablePassthrough
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from langchain.utilities import DuckDuckGoSearchAPIWrapper
 
 load_dotenv()
+
+RESULTS_PER_QUESTION = 3
+
+ddg_search = DuckDuckGoSearchAPIWrapper()
 
 SUMMARY_TEMPLATE = """{text}
 
