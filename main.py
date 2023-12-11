@@ -3,9 +3,11 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 import requests
+import json
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from langchain.utilities import DuckDuckGoSearchAPIWrapper
+
 
 load_dotenv()
 
@@ -46,15 +48,30 @@ def scrape_text(url: str):
         return f"Failed to retrieve the webpage: {e}"
     
 scrape_and_summarize_chain = RunnablePassthrough.assign (
-    text=lambda x: scrape_text(x["url"])[1000]
+    text=lambda x: scrape_text(x["url"])[10000]
 ) | SUMMARY_PROMPT | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
 
-chain = RunnablePassthrough.assign(
+web_search_chain = RunnablePassthrough.assign(
     urls = lambda x: web_search(x["question"])
 ) | (lambda x: [{"question": x["question"], "url": u} for u in x["urls"]]) | scrape_and_summarize_chain.map()
 
+SEARCH_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "user",
+            "Write 3 google search queries to search online that form an "
+            "objective opinion from the following: {question}\n"
+            "You must respond with a list of strings in the following format: "
+            '["query1", "query2", "query3"].',
+        ),
+    ]
+)
+
+search_question_chain = SEARCH_PROMPT | ChatOpenAI(temperature=0) | StrOutputParser() | json.loads
+
+chain = search_question_chain | (lambda x: [{"question": q} for q in x]) | web_search_chain.map()
 chain.invoke(
     {
-        "question": "what is langsmith",
+        "question": "what is the difference between langsmith and langchain",
     }
 )
