@@ -45,10 +45,6 @@ def scrape_text(url: str):
         print(e)
         return f"Failed to retrieve the webpage: {e}"
     
-url = "https://blog.langchain.dev/announcing-langsmith/"
-
-page_content = scrape_text(url)[:10000]
-
 scrape_and_summarize_chain = RunnablePassthrough.assign (
     text=lambda x: scrape_text(x["url"])[1000]
 ) | SUMMARY_PROMPT | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
