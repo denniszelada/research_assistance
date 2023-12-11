@@ -2,5 +2,5 @@
 beautifulsoup4
 langchain 
 openai
-dotenv
+python-dotenv 
 duckduckgo-search
