@@ -1,0 +1,6 @@
+# dependencies
+beautifulsoup4
+langchain 
+openai
+dotenv
+duckduckgo-search
