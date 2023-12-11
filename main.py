@@ -13,6 +13,10 @@ RESULTS_PER_QUESTION = 3
 
 ddg_search = DuckDuckGoSearchAPIWrapper()
 
+def web_search(query: str, num_results: int = RESULTS_PER_QUESTION):
+    results = ddg_search.results(query, num_results)
+    return [r["link"] for r in results]
+
 SUMMARY_TEMPLATE = """{text}
 
 ------
