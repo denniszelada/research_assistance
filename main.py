@@ -49,13 +49,16 @@ url = "https://blog.langchain.dev/announcing-langsmith/"
 
 page_content = scrape_text(url)[:10000]
 
-chain = RunnablePassthrough.assign (
-    text=lambda x: scrape_text(x["url"])[10000]
+scrape_and_summarize_chain = RunnablePassthrough.assign (
+    text=lambda x: scrape_text(x["url"])[1000]
 ) | SUMMARY_PROMPT | ChatOpenAI(model="gpt-3.5-turbo-1106") | StrOutputParser()
+
+chain = RunnablePassthrough.assign(
+    urls = lambda x: web_search(x["question"])
+) | (lambda x: [{"question": x["question"], "url": u} for u in x["urls"]]) | scrape_and_summarize_chain.map()
 
 chain.invoke(
     {
         "question": "what is langsmith",
-        "url": url
     }
 )
